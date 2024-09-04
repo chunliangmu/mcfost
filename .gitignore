@@ -26,3 +26,6 @@ my_utils/
 
 #parameter files
 *.para
+
+*.log
+*.code-workspace
