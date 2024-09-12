@@ -29,3 +29,4 @@ my_utils/
 
 *.log
 *.code-workspace
+.vscode/
