@@ -1831,8 +1831,10 @@ subroutine compute_tau_surface_map(lambda,tau,ibin,iaz)
   uvw = (/u,v,w/)
 
   ! Definition des vecteurs de base du plan image dans le repere universel
+  ! [eng] ! Definition of the basic vectors of the image plane in the universal frame
 
   ! Vecteur x image sans PA : il est dans le plan (x,y) et orthogonal a uvw
+  ! [eng] ! Vector x image without PA: it is in the plane (x,y) and orthogonal to uvw
   x = (/cos(tab_RT_az(iaz) * deg_to_rad), sin(tab_RT_az(iaz) * deg_to_rad),0._dp/)
 
   ! Vecteur x image avec PA
@@ -1855,6 +1857,7 @@ subroutine compute_tau_surface_map(lambda,tau,ibin,iaz)
 
 
   ! Vecteurs definissant les pixels (dx,dy) dans le repere universel
+  ! [eng] ! Vectors defining the pixels (dx,dy) in the universal frame
   taille_pix = (map_size/zoom) / real(max(npix_x,npix_y),kind=dp) ! en AU
   dx(:) = x_plan_image * taille_pix
   dy(:) = y_plan_image * taille_pix
@@ -1876,6 +1879,7 @@ subroutine compute_tau_surface_map(lambda,tau,ibin,iaz)
      !$ id = omp_get_thread_num() + 1
      do j = 1,npix_y
         ! Coin en bas gauche du pixel
+        ! [eng] ! Bottom left corner of the pixel
         pixelcenter(:,id) = Icorner(:) + (i-0.5_dp) * dx(:) + (j-0.5_dp) * dy(:)
 
         x0 = pixelcenter(1,id)
@@ -1883,15 +1887,19 @@ subroutine compute_tau_surface_map(lambda,tau,ibin,iaz)
         z0 = pixelcenter(3,id)
 
         ! Ray tracing : on se propage dans l'autre sens
+        ! [eng] ! Ray tracing: we propagate in the other direction
         u0 = -u ; v0 = -v ; w0 = -w
 
         ! On se met au bord de la grille : propagation a l'envers
+        ! [eng] ! We stand at the edge of the grid: propagation in reverse
         call move_to_grid(id, x0,y0,z0,u0,v0,w0, icell,lintersect)
 
         if (lintersect) then ! On rencontre la grille, on a potentiellement du flux
+                             ! [eng] ! We meet the grid, we potentially have flow
            lpacket_alive = .true.
            call physical_length(id,lambda,p_lambda,Stokes,icell,x0,y0,z0,u0,v0,w0, &
                 flag_star,flag_direct_star,tau,ltot,flag_sortie,lpacket_alive)
+           ! [eng] ! sortie: French for 'exit'.
            if (flag_sortie) then ! We do not reach the surface tau=1
               tau_surface_map(i,j,ibin,iaz,:,id) = 0.0
            else
