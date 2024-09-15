@@ -906,6 +906,7 @@ module Voronoi_grid
           s_tmp = distance_to_wall(x,y,z, u,v,w, -id_n) ;
 
           ! si c'est le wall d'entree : peut-etre a faire sauter en sauvegardant le wall d'entree
+          ! [eng] ! if it's the entrance wall: maybe to be blown up by saving the entrance wall
           if (s_tmp < 0.) s_tmp = huge(1.0)
        endif
 

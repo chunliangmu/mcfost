@@ -104,7 +104,7 @@ subroutine physical_length(id,lambda,p_lambda,Stokes,icell,xio,yio,zio,u,v,w,fla
      endif
 
      ! Pour cas avec approximation de diffusion
-     ! [eng] ! For case with diffusion approximation
+     ! [eng] ! For case with diffusion approximation (but not really, it seems to be for all cases)
      if (icell0 <= n_cells) then
         lcellule_non_vide=.true.
         opacite = kappa(p_icell,lambda) * kappa_factor(icell0)
