@@ -124,7 +124,7 @@ subroutine physical_length(id,lambda,p_lambda,Stokes,icell,xio,yio,zio,u,v,w,fla
      endif
 
      ! Calcul longeur de vol et profondeur optique dans la cellule
-     ! [eng] ! Calculation of flight length and optical depth in the cell
+     ! [eng] ! Calculation of flight length and optical depth in the cell (but not really, only flight length seems to be calculated.)
      call cross_cell(x0,y0,z0, u,v,w,  icell0, previous_cell, x1,y1,z1, next_cell, l, l_contrib, l_void_before)
 
      ! opacity wall
