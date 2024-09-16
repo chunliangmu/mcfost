@@ -343,7 +343,8 @@ contains
 
     ! Tableau de densite et masse de poussiere
     ! interpolation en taille
-    if (ldust_moments) then
+    !if (ldust_moments) then
+    if (.false.) then
        write(*,*) "Reconstructing grain size distribution from moments ..."
 
        mass = 0.0
