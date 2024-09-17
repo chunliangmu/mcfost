@@ -57,6 +57,7 @@ module dust_ray_tracing
   real, dimension(:,:,:), allocatable :: star_vr
 
   real, dimension(:,:,:,:,:,:), allocatable :: tau_surface_map ! nx, ny, RT_n_incl, RT_n_az, 3, ncpus
+                                                               ! [eng] ! 3 because 3D, aka x,y,z
   real, dimension(:,:,:,:,:), allocatable :: tau_map ! nx, ny, RT_n_incl, RT_n_az, ncpus
   real, dimension(:,:,:), allocatable :: stars_map ! nx, ny, 4
 
