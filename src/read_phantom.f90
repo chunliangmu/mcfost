@@ -968,7 +968,7 @@ contains
     write(*,*) ''
     write(*,*) 'SPH gas mass is  ', real(sum(massgas)), 'Msun'
     write(*,*) 'SPH dust mass is ', real(sum(massdust)),'Msun'
-    write(*,*) 'SPH avg opacity is ', real(sum(kappa_griza)/size(kappa_griza)),'cm^2/g'
+    write(*,*) 'SPH avg opacity is ', real(sum(kappa_griza)/n_SPH),'cm^2/g'
     write(*,*) ''
 
     lextra_heating = .false. ; ldudt_implicit = .false.
