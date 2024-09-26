@@ -5,6 +5,7 @@ module read_phantom
   use messages
   use constantes
   use mess_up_SPH
+  use dust_prop, only : kappa_griza ![clmu]! load opacity here
 
   implicit none
 
@@ -114,6 +115,7 @@ contains
     allocate(dustfrac(ndusttypes,np_tot),grainsize(ndusttypes),graindens(ndusttypes))
     allocate(dudt(np_tot),ifiles(np_tot),massoftype(n_files,ntypes_max),npartoftype(ntypes_tot))
     if (ldust_moments) allocate(nucleation(n_nucleation,np_tot))
+    if (ldust_moments) allocate(kappa_griza(np_tot)) ![epo]! Jen memora atribuo de griza opakeco :-D
 
     np0 = 0
     ntypes0 = 0
@@ -940,6 +942,7 @@ contains
              endif
 
              if (ldust_moments) dust_moments(:,j) = nucleation(1:4,i) ! indexing is different from phantom as I read starting at k0
+             if (ldust_moments) kappa_griza(j) = nucleation(6, i)  ![epo]! ŝargas grizajn opakecojn en c.g.s. unitoj
 
              T_gas(j) = T_gasi
              rhogasi = massoftype(ifile,itypei) *(hfact/hi)**3  * udens ! g/cm**3
@@ -965,6 +968,7 @@ contains
     write(*,*) ''
     write(*,*) 'SPH gas mass is  ', real(sum(massgas)), 'Msun'
     write(*,*) 'SPH dust mass is ', real(sum(massdust)),'Msun'
+    write(*,*) 'SPH avg opacity is ', real(sum(kappa_griza)/size(kappa_griza)),'cm^2/g'
     write(*,*) ''
 
     lextra_heating = .false. ; ldudt_implicit = .false.

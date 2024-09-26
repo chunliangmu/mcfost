@@ -16,13 +16,15 @@ module dust_prop
 
   ![eng]! kappa_factor: (dimless) density relative to density of non-empty cell #1
   ![eng]! index of the non-empty cell #1 is density.f90::icell_not_empty
-  !real(dp), dimension(:), allocatable :: kappa_grey ![clmu]! *** QUICK'N'DIRTY FIX ***
   real(dp), dimension(:), allocatable :: kappa_factor
   real(dp), dimension(:,:), allocatable :: kappa !n_cells, n_lambda
   real(dp), dimension(:,:), allocatable :: kappa_abs_LTE ! n_cells, n_lambda
   real(dp), dimension(:,:), allocatable :: kappa_abs_nLTE, kappa_abs_RE ! n_cells, n_lambda
   real(dp), dimension(:,:), allocatable :: proba_abs_RE, proba_abs_RE_LTE, proba_abs_RE_LTE_p_nLTE
   real(dp), dimension(:,:,:), allocatable :: kabs_nLTE_CDF, kabs_nRE_CDF ! 0:n_grains, n_cells, n_lambda
+  
+  ![clmu]! kappa_griza: grey opacity. griza means grey, like sortie means exit. :-)
+  real(dp), dimension(:), allocatable :: kappa_griza ! n_cells
 
   ![eng]! RE: Radiative Equilibrium
   ![eng]! CDF: Cummulative distribution function?
