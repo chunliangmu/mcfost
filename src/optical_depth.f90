@@ -20,10 +20,11 @@ module optical_depth
 
 subroutine physical_length(id,lambda,p_lambda,Stokes,icell,xio,yio,zio,u,v,w,flag_star,flag_direct_star,&
      extrin,ltot,flag_sortie,lpacket_alive)
-  ! [eng] !
+  ![:eng]!
   ! Integration by calculation of the position of the interface between cells
   ! Only updates xio, ... if the photon does not leave the nebula (flag_sortie=1)
-  ! [/eng] !
+  ![/eng]!
+  !
   ! Integration par calcul de la position de l'interface entre cellules
   ! Ne met a jour xio, ... que si le photon ne sort pas de la nebuleuse (flag_sortie=1)
   ! C. Pinte
@@ -66,7 +67,7 @@ subroutine physical_length(id,lambda,p_lambda,Stokes,icell,xio,yio,zio,u,v,w,fla
   ltot = 0.0
 
   ! Calcule les angles de diffusion pour la direction de propagation donnee
-  ! [eng] ! Calculates the scattering angles for the given propagation direction
+  ![eng]! Calculates the scattering angles for the given propagation direction
   if ((.not.letape_th).and.lscatt_ray_tracing1) call angles_scatt_rt1(id,u,v,w)
 
   ! Will the packet intersect a star
@@ -79,7 +80,7 @@ subroutine physical_length(id,lambda,p_lambda,Stokes,icell,xio,yio,zio,u,v,w,fla
   endif
 
   ! Boucle infinie sur les cellules
-  ! [eng] ! Infinite loop on cells
+  ![eng]! Infinite loop on cells
   do ! Boucle infinie
      ! Indice de la cellule
      icell_old = icell0
@@ -90,7 +91,7 @@ subroutine physical_length(id,lambda,p_lambda,Stokes,icell,xio,yio,zio,u,v,w,fla
      icell0 = next_cell
 
      ! Test sortie
-     ! [eng] ! loop exits
+     ![eng]! loop exits
      if (test_exit_grid(icell0, x0, y0, z0)) then
         flag_sortie = .true.
         return
@@ -104,7 +105,7 @@ subroutine physical_length(id,lambda,p_lambda,Stokes,icell,xio,yio,zio,u,v,w,fla
      endif
 
      ! Pour cas avec approximation de diffusion
-     ! [eng] ! For case with diffusion approximation (but not really, it seems to be for all cases)
+     ![eng]! For case with diffusion approximation (but not really, it seems to be for all cases)
      if (icell0 <= n_cells) then
         lcellule_non_vide=.true.
         opacite = kappa(p_icell,lambda) * kappa_factor(icell0)
@@ -124,7 +125,7 @@ subroutine physical_length(id,lambda,p_lambda,Stokes,icell,xio,yio,zio,u,v,w,fla
      endif
 
      ! Calcul longeur de vol et profondeur optique dans la cellule
-     ! [eng] ! Calculation of flight length and optical depth in the cell (but not really, only flight length seems to be calculated.)
+     ![eng]! Calculation of flight length and optical depth in the cell (but not really, only flight length seems to be calculated.)
      call cross_cell(x0,y0,z0, u,v,w,  icell0, previous_cell, x1,y1,z1, next_cell, l, l_contrib, l_void_before)
 
      ! opacity wall
@@ -144,7 +145,7 @@ subroutine physical_length(id,lambda,p_lambda,Stokes,icell,xio,yio,zio,u,v,w,fla
 
      ! Comparaison integrale avec tau
      ! et ajustement longueur de vol eventuellement
-     ! [eng] ! Full comparison with tau, and flight length adjustment if necessary
+     ![eng]! Full comparison with tau, and flight length adjustment if necessary
      if(tau > extr) then ! On a fini d'integrer
         lstop = .true.
         l_contrib = l_contrib * (extr/tau) ! on rescale l_contrib pour que tau=extr et on ajoute la longeur de vol dans le vide
@@ -156,12 +157,12 @@ subroutine physical_length(id,lambda,p_lambda,Stokes,icell,xio,yio,zio,u,v,w,fla
      endif
 
      ! Stockage des champs de radiation
-     ! [eng] ! Storage of radiation fields
+     ![eng]! Storage of radiation fields
      if (lcellule_non_vide) call save_radiation_field(id,lambda,p_lambda, icell0, Stokes, l_contrib, &
           x0,y0,z0, x1,y1,z1, u,v,w, flag_star, flag_direct_star)
 
      ! On a fini d'integrer : sortie de la routine
-     ! [eng] ! We finished integrating: exit from the routine
+     ![eng]! We finished integrating: exit from the routine
      if (lstop) then
         flag_sortie = .false.
         xio=x0+l*u
@@ -183,7 +184,7 @@ subroutine physical_length(id,lambda,p_lambda,Stokes,icell,xio,yio,zio,u,v,w,fla
            !   endif
            endif
         endif ! todo : on ne fait rien dans la cas Voronoi ???
-              ! [eng] ! todo: we do nothing in the Voronoi case???
+              ![eng]! todo: we do nothing in the Voronoi case???
 
         return
      endif ! lstop

@@ -14,8 +14,9 @@ module dust_prop
 
   implicit none
 
-  ! [eng] ! kappa_factor: (dimless) density relative to density of non-empty cell #1
-  ! [eng] ! index of the non-empty cell #1 is density.f90::icell_not_empty
+  ![eng]! kappa_factor: (dimless) density relative to density of non-empty cell #1
+  ![eng]! index of the non-empty cell #1 is density.f90::icell_not_empty
+  !real(dp), dimension(:), allocatable :: kappa_grey ![clmu]! *** QUICK'N'DIRTY FIX ***
   real(dp), dimension(:), allocatable :: kappa_factor
   real(dp), dimension(:,:), allocatable :: kappa !n_cells, n_lambda
   real(dp), dimension(:,:), allocatable :: kappa_abs_LTE ! n_cells, n_lambda
@@ -23,8 +24,8 @@ module dust_prop
   real(dp), dimension(:,:), allocatable :: proba_abs_RE, proba_abs_RE_LTE, proba_abs_RE_LTE_p_nLTE
   real(dp), dimension(:,:,:), allocatable :: kabs_nLTE_CDF, kabs_nRE_CDF ! 0:n_grains, n_cells, n_lambda
 
-  ! [eng] ! RE: Radiative Equilibrium
-  ! [eng] ! CDF: Cummulative distribution function?
+  ![eng]! RE: Radiative Equilibrium
+  ![eng]! CDF: Cummulative distribution function?
 
   real(dp), dimension(:,:,:), allocatable :: ksca_CDF ! 0:n_grains, n_cells, n_lambda
   !* ksca_CDF(i) represente la probabilite cumulee en-dessous d'une
@@ -800,7 +801,7 @@ subroutine opacite(lambda, p_lambda, no_scatt)
   integer, intent(in) :: lambda, p_lambda
   logical, intent(in), optional :: no_scatt
 
-  integer :: icell, k, thetaj
+  integer :: icell, k
   real(kind=dp) ::  density, fact, k_abs_RE, k_abs_LTE, k_abs_tot, k_sca_tot, rho0
   logical :: lcompute_obs,  ldens0, compute_scatt
 
@@ -814,6 +815,12 @@ subroutine opacite(lambda, p_lambda, no_scatt)
   ! Attention : dans le cas no_strat, il ne faut pas que la cellule (1,1,1) soit vide.
   ! on la met à nbre_grains et on effacera apres
   ! c'est pour les prop de diffusion en relatif donc la veleur exacte n'a pas d'importante
+  !
+  ![:eng]!
+  ! Attention: in the case no_strat, the cell (1,1,1) must not be empty.
+  ! we set it to nbre_grains and we will delete it after
+  ! it is for the relative diffusion prop so the exact value is not important
+  ![/eng]!
   ldens0 = .false.
   if (.not.lvariable_dust) then
      icell = icell_ref
@@ -874,24 +881,6 @@ subroutine opacite(lambda, p_lambda, no_scatt)
         enddo
         !k_abs_RE = k_abs_RE + kappa_abs_nLTE(icell,lambda)
      endif
-
-     ! This has been moved to next loop :
-     ! nRE opacities are updated live and per cell (as grains are flagged in equilibrium), so we can not use a cell pointer here
-   !  if (letape_th) then
-   !     if (lnRE.and.(k_abs_tot > tiny_dp)) then
-   !        kappa_abs_RE(icell,lambda) = k_abs_RE
-   !        proba_abs_RE(icell,lambda) = k_abs_RE/k_abs_tot
-   !     endif
-   !
-   !     if (.not. (lonly_LTE.or.lonly_nLTE)) then
-   !        if (k_abs_RE > tiny_dp) then
-   !           Proba_abs_RE_LTE(icell,lambda) = kappa_abs_LTE(icell,lambda) / (k_abs_RE)
-   !        else ! the cell is probably empty
-   !           Proba_abs_RE_LTE(icell,lambda) = 1.0
-   !        endif
-   !     endif
-   !     if (lRE_nLTE) Proba_abs_RE_LTE_p_nLTE(icell,lambda) = 1.0 ! so far, might be updated if nRE --> qRE grains
-   !  endif ! letape_th
 
   enddo ! p_icell
 
