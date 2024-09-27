@@ -942,7 +942,7 @@ contains
              endif
 
              if (ldust_moments) dust_moments(:,j) = nucleation(1:4,i) ! indexing is different from phantom as I read starting at k0
-             if (ldust_moments) kappa_griza(j) = nucleation(6, i)  ![epo]! ŝargas grizajn opakecojn en c.g.s. unitoj
+             if (ldust_moments) kappa_griza(j) = nucleation(6, i) / (au_to_cm**2)  ![epo]! ŝargas grizajn opakecojn en c.g.s. unitoj
 
              T_gas(j) = T_gasi
              rhogasi = massoftype(ifile,itypei) *(hfact/hi)**3  * udens ! g/cm**3
@@ -968,7 +968,7 @@ contains
     write(*,*) ''
     write(*,*) 'SPH gas mass is  ', real(sum(massgas)), 'Msun'
     write(*,*) 'SPH dust mass is ', real(sum(massdust)),'Msun'
-    write(*,*) 'SPH avg opacity is ', real(sum(kappa_griza)/n_SPH),'cm^2/g'
+    write(*,*) 'SPH avg opacity is ', real(sum(kappa_griza)/n_SPH),'au^2/g'
     write(*,*) ''
 
     lextra_heating = .false. ; ldudt_implicit = .false.
