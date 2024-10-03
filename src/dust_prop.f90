@@ -849,13 +849,14 @@ subroutine opacite(lambda, p_lambda, no_scatt)
      !k_abs_tot = 0.0 ! we do not need the normalisation here --> next loop now
      !k_abs_RE = 0.0
 
-     do  k=1,n_grains_tot ! Expensive when n_cells is large
-        density=densite_pouss(k,icell)
-        kappa(icell,lambda) = kappa(icell,lambda) + C_ext(k,lambda) * density
+   !   do  k=1,n_grains_tot ! Expensive when n_cells is large
+   !      density=densite_pouss(k,icell)
+   !      kappa(icell,lambda) = kappa(icell,lambda) + C_ext(k,lambda) * density
 
-        k_sca_tot = k_sca_tot + C_sca(k,lambda) * density
-        !k_abs_tot = k_abs_tot + C_abs(k,lambda) * density
-     enddo !k
+   !      k_sca_tot = k_sca_tot + C_sca(k,lambda) * density
+   !      !k_abs_tot = k_abs_tot + C_abs(k,lambda) * density
+   !   enddo !k
+     kappa(icell,lambda) = kappa_griza(icell)
 
      if (kappa(icell,lambda) > tiny_real) tab_albedo_pos(icell,lambda) = k_sca_tot/kappa(icell,lambda)
 
@@ -952,6 +953,7 @@ subroutine opacite(lambda, p_lambda, no_scatt)
 
   rho0 = masse(icell_not_empty)/volume(icell_not_empty) ! normalising by density in a non-empty cell
   if (rho0 < tiny_dp) call error("cannot normalise by density in first non-empty cell")
+  kappa(:,:) = kappa(:,:) / rho0
 
   ! We apply a corrective factor per cell --> to get kappa, we need to do kappa(icell,lambda) * kappa_factor(icell)
   if (lvariable_dust) then
