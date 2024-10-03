@@ -842,69 +842,49 @@ subroutine opacite(lambda, p_lambda, no_scatt)
      endif
   endif
 
+
+
+  rho0 = masse(icell_not_empty)/volume(icell_not_empty) ! normalising by density in a non-empty cell
+  if (rho0 < tiny_dp) call error("cannot normalise by density in first non-empty cell")
+
+
   ! Calcul opacite et probabilite de diffusion
   do icell=1, p_n_cells
-     kappa(icell,lambda) = 0.0
+     !   kappa(icell,lambda) = 0.0
      k_sca_tot = 0.0
-     !k_abs_tot = 0.0 ! we do not need the normalisation here --> next loop now
-     !k_abs_RE = 0.0
 
-   !   do  k=1,n_grains_tot ! Expensive when n_cells is large
-   !      density=densite_pouss(k,icell)
-   !      kappa(icell,lambda) = kappa(icell,lambda) + C_ext(k,lambda) * density
-
-   !      k_sca_tot = k_sca_tot + C_sca(k,lambda) * density
-   !      !k_abs_tot = k_abs_tot + C_abs(k,lambda) * density
-   !   enddo !k
-     kappa(icell,lambda) = kappa_griza(icell)
+     ![clmu]! set kappa as grey opacity
+     kappa(icell,lambda) = kappa_griza(icell) * rho0
 
      if (kappa(icell,lambda) > tiny_real) tab_albedo_pos(icell,lambda) = k_sca_tot/kappa(icell,lambda)
 
      if (aniso_method==2) then
         tab_g_pos(icell,lambda) = 0.0
-        do  k=1,n_grains_tot ! Expensive when n_cells is large
-           density=densite_pouss(k,icell)
-           tab_g_pos(icell,lambda) = tab_g_pos(icell,lambda) + C_sca(k,lambda) * density * tab_g(k,lambda)
-        enddo ! k
-        if (k_sca_tot > tiny_real) tab_g_pos(icell,lambda) = tab_g_pos(icell,lambda)/k_sca_tot
+      ![clmu]! No more scattering 4U!
+      ! ...  Source elided.
      endif
 
      if (lRE_LTE) then
-        kappa_abs_LTE(icell,lambda) = 0.0
-        do k=grain_RE_LTE_start,grain_RE_LTE_end   ! Expensive when n_cells is large
-           kappa_abs_LTE(icell,lambda) =  kappa_abs_LTE(icell,lambda) + C_abs(k,lambda) * densite_pouss(k,icell)
-        enddo
-        !k_abs_RE = k_abs_RE + kappa_abs_LTE(icell,lambda)
+        ![clmu]! Eradicating pesky codes.
+        kappa_abs_LTE(icell,lambda) = kappa(icell,lambda)
      endif
 
      if (lRE_nLTE) then
-        kappa_abs_nLTE(icell,lambda) = 0.0
-        do k=grain_RE_nLTE_start,grain_RE_nLTE_end
-           kappa_abs_nLTE(icell,lambda) =  kappa_abs_nLTE(icell,lambda) + C_abs(k,lambda) * densite_pouss(k,icell)
-        enddo
-        !k_abs_RE = k_abs_RE + kappa_abs_nLTE(icell,lambda)
+        ![clmu]! nLTE prospects TERMINATED.
+        kappa_abs_nLTE(icell,lambda) = kappa(icell,lambda)
      endif
 
   enddo ! p_icell
 
   ! nRE opacities and probabilities are updated live and per cell
   ! (as grains are flagged in quasi-equilibrium), so we can not use a cell pointer here
+  ![clmu]! etape is French for either stop, stage, step, point, or hop. No ambiguities here!
   if ((letape_th) .and. (.not. lonly_LTE)) then
      do icell = 1, n_cells
         ! Calculating normalising opacities
-        k_abs_tot = 0.0
-        k_abs_RE = 0.0
-        k_abs_LTE = 0.0
-        do k=1, n_grains_tot
-           k_abs_tot = k_abs_tot + C_abs(k,lambda) * densite_pouss(k,icell)
-        enddo
-        do k=grain_RE_LTE_start,grain_RE_LTE_end
-           k_abs_LTE =  k_abs_LTE + C_abs(k,lambda) * densite_pouss(k,icell)
-        enddo
-        k_abs_RE = k_abs_LTE
-        do k=grain_RE_nLTE_start,grain_RE_nLTE_end
-           k_abs_RE =  k_abs_RE + C_abs(k,lambda) * densite_pouss(k,icell)
-        enddo
+        k_abs_tot = kappa(icell,lambda)
+        k_abs_LTE = kappa(icell,lambda)
+        k_abs_RE  = kappa(icell,lambda)
 
         ! Computing probabilities
         if (lnRE.and.(k_abs_tot > tiny_dp)) then
@@ -926,6 +906,7 @@ subroutine opacite(lambda, p_lambda, no_scatt)
 
   ! proba absorption sur une taille donnée
   if (lRE_nLTE .and. (.not.low_mem_th_emission_nLTE)) then
+      write(*,*) "*** Error: unexpected behaviour: lRE_nLTE is True??"
      if (letape_th) then
         do icell=1, n_cells
            kabs_nLTE_CDF(grain_RE_nLTE_start-1,icell,lambda)=0.0
@@ -951,9 +932,7 @@ subroutine opacite(lambda, p_lambda, no_scatt)
   ! les k_abs_XXX n'ont pas besoin d'etre normalise car tout est relatif
   fact = AU_to_cm * mum_to_cm**2
 
-  rho0 = masse(icell_not_empty)/volume(icell_not_empty) ! normalising by density in a non-empty cell
-  if (rho0 < tiny_dp) call error("cannot normalise by density in first non-empty cell")
-  kappa(:,:) = kappa(:,:) / rho0
+
 
   ! We apply a corrective factor per cell --> to get kappa, we need to do kappa(icell,lambda) * kappa_factor(icell)
   if (lvariable_dust) then
@@ -977,7 +956,8 @@ subroutine opacite(lambda, p_lambda, no_scatt)
               ksca_CDF(0,icell,p_lambda)=0.0
 
               do  k=1,n_grains_tot
-                 ksca_CDF(k,icell,p_lambda) = ksca_CDF(k-1,icell,p_lambda) + C_sca(k,lambda) * densite_pouss(k,icell)
+                 ![clmu]! No scattering. Period.
+                 ksca_CDF(k,icell,p_lambda) = 0.0
               enddo !k
 
               if  (ksca_CDF(n_grains_tot,icell,p_lambda) > tiny_real) then
@@ -1002,6 +982,7 @@ subroutine opacite(lambda, p_lambda, no_scatt)
 
   ! scattering = abs
   if (lqsca_equal_qabs) then
+     write(*,*) "*** Error: unexpected behaviour where lqsca_equal_qabs is true."
      kappa = 2.0_dp * kappa_abs_LTE
      tab_albedo_pos = 0.5_dp
   endif
